@@ -1,0 +1,12 @@
+D:\Fontes\ERP\API\Financeiro\Financeiro.Domain\bin\Debug\net10.0\Financeiro.Domain.deps.json
+D:\Fontes\ERP\API\Financeiro\Financeiro.Domain\bin\Debug\net10.0\Financeiro.Domain.dll
+D:\Fontes\ERP\API\Financeiro\Financeiro.Domain\bin\Debug\net10.0\Financeiro.Domain.pdb
+D:\Fontes\ERP\API\Financeiro\Financeiro.Domain\obj\Debug\net10.0\Financeiro.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\Fontes\ERP\API\Financeiro\Financeiro.Domain\obj\Debug\net10.0\Financeiro.Domain.AssemblyInfoInputs.cache
+D:\Fontes\ERP\API\Financeiro\Financeiro.Domain\obj\Debug\net10.0\Financeiro.Domain.AssemblyInfo.cs
+D:\Fontes\ERP\API\Financeiro\Financeiro.Domain\obj\Debug\net10.0\Financeiro.Domain.csproj.CoreCompileInputs.cache
+D:\Fontes\ERP\API\Financeiro\Financeiro.Domain\obj\Debug\net10.0\Financeiro.Domain.dll
+D:\Fontes\ERP\API\Financeiro\Financeiro.Domain\obj\Debug\net10.0\refint\Financeiro.Domain.dll
+D:\Fontes\ERP\API\Financeiro\Financeiro.Domain\obj\Debug\net10.0\Financeiro.Domain.pdb
+D:\Fontes\ERP\API\Financeiro\Financeiro.Domain\obj\Debug\net10.0\ref\Financeiro.Domain.dll
+D:\Fontes\ERP\API\Financeiro\Financeiro.Domain\obj\Debug\net10.0\Financei.C60E1661.Up2Date

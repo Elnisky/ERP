@@ -1,0 +1,15 @@
+D:\Fontes\ERP\API\Financeiro\Financeiro.Application\bin\Debug\net10.0\Financeiro.Application.deps.json
+D:\Fontes\ERP\API\Financeiro\Financeiro.Application\bin\Debug\net10.0\Financeiro.Application.dll
+D:\Fontes\ERP\API\Financeiro\Financeiro.Application\bin\Debug\net10.0\Financeiro.Application.pdb
+D:\Fontes\ERP\API\Financeiro\Financeiro.Application\bin\Debug\net10.0\Financeiro.Domain.dll
+D:\Fontes\ERP\API\Financeiro\Financeiro.Application\bin\Debug\net10.0\Financeiro.Domain.pdb
+D:\Fontes\ERP\API\Financeiro\Financeiro.Application\obj\Debug\net10.0\Financeiro.Application.csproj.AssemblyReference.cache
+D:\Fontes\ERP\API\Financeiro\Financeiro.Application\obj\Debug\net10.0\Financeiro.Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\Fontes\ERP\API\Financeiro\Financeiro.Application\obj\Debug\net10.0\Financeiro.Application.AssemblyInfoInputs.cache
+D:\Fontes\ERP\API\Financeiro\Financeiro.Application\obj\Debug\net10.0\Financeiro.Application.AssemblyInfo.cs
+D:\Fontes\ERP\API\Financeiro\Financeiro.Application\obj\Debug\net10.0\Financeiro.Application.csproj.CoreCompileInputs.cache
+D:\Fontes\ERP\API\Financeiro\Financeiro.Application\obj\Debug\net10.0\Financei.5CB47A28.Up2Date
+D:\Fontes\ERP\API\Financeiro\Financeiro.Application\obj\Debug\net10.0\Financeiro.Application.dll
+D:\Fontes\ERP\API\Financeiro\Financeiro.Application\obj\Debug\net10.0\refint\Financeiro.Application.dll
+D:\Fontes\ERP\API\Financeiro\Financeiro.Application\obj\Debug\net10.0\Financeiro.Application.pdb
+D:\Fontes\ERP\API\Financeiro\Financeiro.Application\obj\Debug\net10.0\ref\Financeiro.Application.dll

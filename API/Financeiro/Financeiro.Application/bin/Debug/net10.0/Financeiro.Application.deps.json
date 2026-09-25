@@ -1,0 +1,39 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "Financeiro.Application/1.0.0": {
+        "dependencies": {
+          "Financeiro.Domain": "1.0.0"
+        },
+        "runtime": {
+          "Financeiro.Application.dll": {}
+        }
+      },
+      "Financeiro.Domain/1.0.0": {
+        "runtime": {
+          "Financeiro.Domain.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Financeiro.Application/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Financeiro.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

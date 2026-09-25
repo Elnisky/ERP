@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2026/09/24 10:17:17.000.148,=C:\Users\Rosiane\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2026/09/24 10:48:57.000.944,D:\Fontes\ERP\Delphi\View.Principal.pas=C:\Users\Rosiane\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2026/09/24 10:48:57.000.944,D:\Fontes\ERP\Delphi\View.Principal.dfm=C:\Users\Rosiane\Documents\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
+    <Transaction>2026/09/24 10:49:23.000.552,D:\Fontes\ERP\Delphi\AvaliacaoCartSys.dproj=C:\Users\Rosiane\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2026/09/24 11:37:43.000.277,=D:\Fontes\ERP\Delphi\Unit1.pas</Transaction>
+    <Transaction>2026/09/24 11:38:08.000.256,D:\Fontes\ERP\Delphi\Unit1.pas=D:\Fontes\ERP\Delphi\view\View.Base.Listagem.pas</Transaction>
+    <Transaction>2026/09/24 11:38:08.000.256,D:\Fontes\ERP\Delphi\Unit1.dfm=D:\Fontes\ERP\Delphi\view\View.Base.Listagem.dfm</Transaction>
+    <Transaction>2026/09/24 11:47:19.000.500,=D:\Fontes\ERP\Delphi\Unit1.pas</Transaction>
+    <Transaction>2026/09/24 11:50:13.000.948,D:\Fontes\ERP\Delphi\Unit1.pas=D:\Fontes\ERP\Delphi\view\View.Listagem.Cliente.pas</Transaction>
+    <Transaction>2026/09/24 11:50:13.000.948,D:\Fontes\ERP\Delphi\Unit1.dfm=D:\Fontes\ERP\Delphi\view\View.Listagem.Cliente.dfm</Transaction>
+    <Transaction>2026/09/24 14:32:07.000.972,=D:\Fontes\ERP\Delphi\services\API.Response.Base.pas</Transaction>
+    <Transaction>2026/09/24 14:32:39.000.420,=D:\Fontes\ERP\Delphi\services\HttpClient\Indy\HttpClient.Indy.pas</Transaction>
+    <Transaction>2026/09/24 14:32:39.000.457,=D:\Fontes\ERP\Delphi\services\HttpClient\Indy\HttpClient.Response.pas</Transaction>
+    <Transaction>2026/09/24 14:33:02.000.594,=D:\Fontes\ERP\Delphi\services\HttpClient\Contracts\HttpClient.Interfaces.pas</Transaction>
+    <Transaction>2026/09/24 14:33:02.000.622,=D:\Fontes\ERP\Delphi\services\HttpClient\Contracts\HttpClient.Types.pas</Transaction>
+    <Transaction>2026/09/24 14:51:47.000.161,=D:\Fontes\ERP\Delphi\services\API\Contracts\ApiCross.Interfaces.pas</Transaction>
+    <Transaction>2026/09/24 14:53:33.000.440,D:\Fontes\ERP\Delphi\services\API\Contracts\ApiCross.Interfaces.pas=</Transaction>
+    <Transaction>2026/09/24 15:39:15.000.976,=D:\Fontes\ERP\Delphi\controller\ClienteController.pas</Transaction>
+    <Transaction>2026/09/24 15:39:39.000.385,=D:\Fontes\ERP\Delphi\services\API\Contracts\Financeiro.Interfaces.pas</Transaction>
+    <Transaction>2026/09/24 15:39:55.000.123,=D:\Fontes\ERP\Delphi\services\API\DTOs\Financeiro.DTO.Interfaces.pas</Transaction>
+    <Transaction>2026/09/24 15:39:55.000.158,=D:\Fontes\ERP\Delphi\services\API\DTOs\Financeiro.DTOs.pas</Transaction>
+    <Transaction>2026/09/24 15:40:07.000.898,=D:\Fontes\ERP\Delphi\services\API\Exceptions\Financeiro.Exceptions.pas</Transaction>
+    <Transaction>2026/09/24 15:40:22.000.933,=D:\Fontes\ERP\Delphi\services\API\Financeiro.Client.pas</Transaction>
+    <Transaction>2026/09/24 19:46:27.000.032,=D:\Fontes\ERP\Delphi\Unit1.pas</Transaction>
+    <Transaction>2026/09/24 19:48:37.000.454,D:\Fontes\ERP\Delphi\view\View.Listagem.Produtos.dfm=D:\Fontes\ERP\Delphi\Unit1.dfm</Transaction>
+    <Transaction>2026/09/24 19:48:37.000.454,D:\Fontes\ERP\Delphi\view\View.Listagem.Produtos.pas=D:\Fontes\ERP\Delphi\Unit1.pas</Transaction>
+    <Transaction>2026/09/24 19:48:46.000.257,D:\Fontes\ERP\Delphi\view\View.Listagem.Produto.pas=D:\Fontes\ERP\Delphi\view\View.Listagem.Produtos.pas</Transaction>
+    <Transaction>2026/09/24 19:48:46.000.257,D:\Fontes\ERP\Delphi\view\View.Listagem.Produto.dfm=D:\Fontes\ERP\Delphi\view\View.Listagem.Produtos.dfm</Transaction>
+    <Transaction>2026/09/24 19:49:29.000.321,=D:\Fontes\ERP\Delphi\Unit1.pas</Transaction>
+    <Transaction>2026/09/24 19:50:59.000.287,D:\Fontes\ERP\Delphi\controller\ProdutoController.pas=D:\Fontes\ERP\Delphi\Unit1.pas</Transaction>
+    <Transaction>2026/09/24 20:41:21.246,=D:\Fontes\ERP\Delphi\Unit1.pas</Transaction>
+    <Transaction>2026/09/24 20:47:34.220,D:\Fontes\ERP\Delphi\view\View.Base.Cadastro.pas=D:\Fontes\ERP\Delphi\Unit1.pas</Transaction>
+    <Transaction>2026/09/24 20:47:34.220,D:\Fontes\ERP\Delphi\view\View.Base.Cadastro.dfm=D:\Fontes\ERP\Delphi\Unit1.dfm</Transaction>
+    <Transaction>2026/09/24 20:47:48.473,=D:\Fontes\ERP\Delphi\Unit1.pas</Transaction>
+    <Transaction>2026/09/24 21:01:19.746,D:\Fontes\ERP\Delphi\view\View.Cadastro.Cliente.dfm=D:\Fontes\ERP\Delphi\Unit1.dfm</Transaction>
+    <Transaction>2026/09/24 21:01:19.746,D:\Fontes\ERP\Delphi\view\View.Cadastro.Cliente.pas=D:\Fontes\ERP\Delphi\Unit1.pas</Transaction>
+    <Transaction>2026/09/24 23:38:56.800,=D:\Fontes\ERP\Delphi\Unit1.pas</Transaction>
+    <Transaction>2026/09/24 23:41:42.239,D:\Fontes\ERP\Delphi\view\View.Cadastro.Produto.dfm=D:\Fontes\ERP\Delphi\Unit1.dfm</Transaction>
+    <Transaction>2026/09/24 23:41:42.239,D:\Fontes\ERP\Delphi\view\View.Cadastro.Produto.pas=D:\Fontes\ERP\Delphi\Unit1.pas</Transaction>
+    <Transaction>2026/09/25 12:08:25.179,=D:\Fontes\ERP\Delphi\Unit1.pas</Transaction>
+    <Transaction>2026/09/25 12:11:13.540,D:\Fontes\ERP\Delphi\view\View.Listagem.Venda.dfm=D:\Fontes\ERP\Delphi\Unit1.dfm</Transaction>
+    <Transaction>2026/09/25 12:11:13.540,D:\Fontes\ERP\Delphi\view\View.Listagem.Venda.pas=D:\Fontes\ERP\Delphi\Unit1.pas</Transaction>
+    <Transaction>2026/09/25 13:54:59.875,=D:\Fontes\ERP\Delphi\controller\VendaController.pas</Transaction>
+    <Transaction>2026/09/25 16:51:25.345,=D:\Fontes\ERP\Delphi\view\View.Cadastro.Venda.pas</Transaction>
+  </Transactions>
+</BorlandProject>

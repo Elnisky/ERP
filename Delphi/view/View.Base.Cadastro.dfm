@@ -1,0 +1,124 @@
+object frmBaseCadastro: TfrmBaseCadastro
+  Left = 0
+  Top = 0
+  BorderIcons = []
+  ClientHeight = 294
+  ClientWidth = 352
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
+  Font.Style = []
+  Position = poOwnerFormCenter
+  TextHeight = 15
+  object Panel1: TPanel
+    Left = 0
+    Top = 237
+    Width = 352
+    Height = 57
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 0
+    ExplicitTop = 272
+    object btnCancelar: TButton
+      AlignWithMargins = True
+      Left = 20
+      Top = 3
+      Width = 75
+      Height = 51
+      Margins.Left = 20
+      Align = alLeft
+      Caption = 'Cancelar'
+      TabOrder = 0
+      OnClick = btnCancelarClick
+      ExplicitLeft = 16
+      ExplicitTop = 0
+      ExplicitHeight = 25
+    end
+    object btnConfirmar: TButton
+      AlignWithMargins = True
+      Left = 257
+      Top = 3
+      Width = 75
+      Height = 51
+      Margins.Right = 20
+      Align = alRight
+      Caption = 'Confirmar'
+      TabOrder = 1
+      ExplicitLeft = 180
+    end
+  end
+  object DBLabeledEdit1: TDBLabeledEdit
+    AlignWithMargins = True
+    Left = 3
+    Top = 25
+    Width = 346
+    Height = 23
+    Margins.Top = 25
+    Align = alTop
+    DataSource = dsCadastro
+    TabOrder = 1
+    EditLabel.Width = 82
+    EditLabel.Height = 15
+    ExplicitLeft = 24
+    ExplicitTop = 24
+    ExplicitWidth = 121
+  end
+  object DBLabeledEdit2: TDBLabeledEdit
+    AlignWithMargins = True
+    Left = 3
+    Top = 76
+    Width = 346
+    Height = 23
+    Margins.Top = 25
+    Align = alTop
+    DataSource = dsCadastro
+    TabOrder = 2
+    EditLabel.Width = 3
+    EditLabel.Height = 15
+    ExplicitLeft = 6
+    ExplicitTop = 33
+  end
+  object DBLabeledEdit3: TDBLabeledEdit
+    AlignWithMargins = True
+    Left = 3
+    Top = 127
+    Width = 346
+    Height = 23
+    Margins.Top = 25
+    Align = alTop
+    DataSource = dsCadastro
+    TabOrder = 3
+    EditLabel.Width = 3
+    EditLabel.Height = 15
+    ExplicitLeft = 8
+    ExplicitTop = 207
+  end
+  object DBLabeledEdit4: TDBLabeledEdit
+    AlignWithMargins = True
+    Left = 3
+    Top = 178
+    Width = 346
+    Height = 23
+    Margins.Top = 25
+    Align = alTop
+    DataSource = dsCadastro
+    TabOrder = 4
+    EditLabel.Width = 3
+    EditLabel.Height = 15
+    ExplicitLeft = 8
+    ExplicitTop = 212
+  end
+  object dsCadastro: TDataSource
+    DataSet = cdsCadastro
+    Left = 128
+    Top = 200
+  end
+  object cdsCadastro: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    Left = 200
+    Top = 200
+  end
+end
