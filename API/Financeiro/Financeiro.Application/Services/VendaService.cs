@@ -17,11 +17,15 @@ namespace Financeiro.Application.Services
     {
         private readonly IVendaRepository _vendaRepository;
         private readonly IPagamentoService _pagamentoService;
+        private readonly IPdfGenerator _pdfGenerator;
+        private readonly IEmailSender _emailSender;
 
-        public VendaService(IVendaRepository vendaRepository, IPagamentoService pagamentoService)
+        public VendaService(IVendaRepository vendaRepository, IPagamentoService pagamentoService, IPdfGenerator pdfGenerator, IEmailSender emailSender)
         {
             _vendaRepository = vendaRepository;
             _pagamentoService = pagamentoService;
+            _pdfGenerator = pdfGenerator;
+            _emailSender = emailSender;
         }
 
         public async Task<VendaGetDTO> AddAsync(VendaPostDTO vendaPostDTO)
@@ -155,6 +159,45 @@ namespace Financeiro.Application.Services
             if (venda.Status == StatusVenda.Pago)
             {
                 venda.PagoEm = DateTime.Now;
+
+                var rnd = new Random();
+                var tipos = Enum.GetValues(typeof(TipoPagamento));
+                var tipoAleatorio = (TipoPagamento)tipos.GetValue(rnd.Next(tipos.Length));
+
+                var pagamentoPost = new PagamentoPostDTO
+                {
+                    VendaId = venda.Id,
+                    Valor = venda.Total,
+                    Type = tipoAleatorio
+                };
+
+                var pagamentoCriado = await _pagamentoService.AddAsync(pagamentoPost);
+
+                var pagamentoPut = new PagamentoPutDTO
+                {
+                    Id = pagamentoCriado.Id,
+                    Status = PagamentoStatus.Pago,
+                    CompletedAt = DateTime.Now
+                };
+
+                var pagamentoAtualizado = await _pagamentoService.UpdateAsync(pagamentoPut);
+
+                try
+                {
+                    var pdf = await _pdfGenerator.GeneratePaymentReceiptAsync(pagamentoAtualizado);
+                    var clienteEmail = venda.Cliente?.Email;
+                    if (!string.IsNullOrWhiteSpace(clienteEmail))
+                    {
+                        var subject = "Comprovante de pagamento";
+                        var body = $"<p>Olá {venda.Cliente?.Nome ?? "Cliente"},</p><p>Em anexo está o comprovante do pagamento (ID {pagamentoAtualizado.Id}) referente à venda {venda.Id} no valor de R$ {pagamentoAtualizado.Valor:0.00}.</p><p>Atenciosamente,<br/>Financeiro API</p>";
+                        var attachments = new[] { ($"comprovante-{pagamentoAtualizado.Id}.pdf", pdf) };
+                        await _emailSender.SendEmailAsync(clienteEmail, subject, body, attachments);
+                    }
+                }
+                catch
+                {
+                    // Não propagar exceção de email/pdf para não impedir atualização da venda.
+                }
             }
             
             var updated = await _vendaRepository.UpdateAsync(venda);

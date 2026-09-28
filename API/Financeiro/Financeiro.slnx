@@ -4,4 +4,5 @@
   <Project Path="Financeiro.Domain/Financeiro.Domain.csproj" />
   <Project Path="Financeiro.Infra.Data/Financeiro.Infra.Data.csproj" />
   <Project Path="Financeiro.Infra.Ioc/Financeiro.Infra.Ioc.csproj" />
+  <Project Path="Financeiro.Infra.Reports/Financeiro.Infra.Reports.csproj" />
 </Solution>

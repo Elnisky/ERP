@@ -7,10 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="QuestPDF" Version="2026.9.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Financeiro.Application\Financeiro.Application.csproj" />
-    <ProjectReference Include="..\Financeiro.Domain\Financeiro.Domain.csproj" />
-    <ProjectReference Include="..\Financeiro.Infra.Data\Financeiro.Infra.Data.csproj" />
-    <ProjectReference Include="..\Financeiro.Infra.Reports\Financeiro.Infra.Reports.csproj" />
   </ItemGroup>
 
 </Project>

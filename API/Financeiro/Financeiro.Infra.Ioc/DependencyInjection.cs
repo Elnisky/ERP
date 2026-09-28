@@ -3,6 +3,7 @@ using Financeiro.Application.Services;
 using Financeiro.Domain.Interfaces;
 using Financeiro.Infra.Data.Context;
 using Financeiro.Infra.Data.Repositories;
+using Financeiro.Infra.Reports;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +33,10 @@ namespace Financeiro.Infra.Ioc
             services.AddScoped<IPagamentoService, PagamentoService>();
             services.AddScoped<IVendaService, VendaService>();
             services.AddScoped<IVendaItemService, VendaItemService>();
+
+            services.AddScoped<IPdfGenerator, QuestPdfGenerator>();
+
+            services.AddScoped<IEmailSender, SmtpEmailSender>();
 
             return services;
         }
