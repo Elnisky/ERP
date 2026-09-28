@@ -10,7 +10,5 @@ namespace Financeiro.Application.DTOs.Venda
         public int Id { get; set; }
 
         public StatusVenda Status { get; set; }
-
-        public DateTime? PagoEm { get; set; }
     }
 }

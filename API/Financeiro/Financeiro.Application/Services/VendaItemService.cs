@@ -121,6 +121,57 @@ namespace Financeiro.Application.Services
             };
         }
 
+        public async Task<List<VendaItemGetDTO>> UpdateManyAsync(List<VendaItemPostDTO> vendaItemPostDTOs)
+        {
+            if (vendaItemPostDTOs == null || !vendaItemPostDTOs.Any())
+                throw new ArgumentException("Nenhum item informado para atualização.");
+
+            // Todos os itens devem pertencer à mesma venda
+            var vendaIds = vendaItemPostDTOs.Select(d => d.VendaId).Distinct().ToList();
+            if (vendaIds.Count != 1)
+                throw new ArgumentException("Todos os itens devem pertencer à mesma venda.");
+
+            var vendaId = vendaIds.First();
+
+            // Deletar todos os itens atualmente associados à venda
+            var allItems = await _vendaItemRepository.GetAllAsync();
+            var itemsToDelete = allItems.Where(i => i.VendaId == vendaId).ToList();
+            foreach (var it in itemsToDelete)
+            {
+                await _vendaItemRepository.DeleteAsync(it);
+            }
+
+            // Adicionar os novos itens recebidos
+            var createdItems = new List<VendaItemGetDTO>();
+            foreach (var dto in vendaItemPostDTOs)
+            {
+                var vendaItem = new VendaItem
+                {
+                    VendaId = dto.VendaId,
+                    ProdutoId = dto.ProdutoId,
+                    Quantidade = dto.Quantidade,
+                    ValorUnitario = dto.ValorUnitario,
+                    ValorTotal = dto.Quantidade * dto.ValorUnitario
+                };
+
+                var created = await _vendaItemRepository.AddAsync(vendaItem);
+                createdItems.Add(new VendaItemGetDTO
+                {
+                    Id = created.Id,
+                    VendaId = created.VendaId,
+                    ProdutoId = created.ProdutoId,
+                    Quantidade = created.Quantidade,
+                    ValorUnitario = created.ValorUnitario,
+                    ValorTotal = created.ValorTotal
+                });
+            }
+
+            // Recalcula total da venda
+            await RecalculateVendaTotal(vendaId);
+
+            return createdItems;
+        }
+
         private async Task RecalculateVendaTotal(int vendaId)
         {
             var itens = await _vendaItemRepository.GetAllAsync();

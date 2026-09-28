@@ -60,6 +60,7 @@ object frmPrincipal: TfrmPrincipal
           Align = alTop
           Caption = 'Excluir Venda'
           TabOrder = 1
+          OnClick = btnExcluirVendaClick
         end
         object btnEditarVenda: TButton
           AlignWithMargins = True
@@ -70,6 +71,7 @@ object frmPrincipal: TfrmPrincipal
           Align = alTop
           Caption = 'Editar Venda'
           TabOrder = 2
+          OnClick = btnEditarVendaClick
         end
         object btnIncluirVenda: TButton
           AlignWithMargins = True
@@ -91,6 +93,7 @@ object frmPrincipal: TfrmPrincipal
           Align = alTop
           Caption = 'Pagar Venda'
           TabOrder = 4
+          OnClick = btnExcluirVendaClick
         end
       end
       object pnlCadastroProduto: TCategoryPanel

@@ -18,22 +18,32 @@ uses
   Vcl.Graphics,
   Vcl.StdCtrls,
   View.Base.Listagem,
+  ClienteController,
+  ProdutoController,
   VendaController,
   Financeiro.DTOs,
   Winapi.Windows,
   Winapi.Messages;
 
 type
+  TOnVendaSelecionada = procedure(Sender: TObject; const AStatusId: Integer; const AVendaId: Integer) of object;
+
   TfrmListagemVenda = class(TfrmBaseListagem)
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure cdsListaAfterScroll(DataSet: TDataSet);
   private
     FController: TVendaController;
+    FClienteController: TClienteController;
+    FProdutoController: TProdutoController;
+    FOnVendaSelecionada: TOnVendaSelecionada;
     function StatusVendaToText(const AStatus: Integer): string;
     function PagoEmToText(const APagoEm: string): string;
     function TotalToCurrencyText(const ATotal: Double): string;
     function ValorItemToCurrencyText(const AValor: Double): string;
+    function NomeClientePorId(const AClienteId: Integer): string;
+    function NomeProdutoPorId(const AProdutoId: Integer): string;
+    procedure DoVendaSelecionada;
     procedure InicializarCDS;
     procedure InicializarDBGrid;
     procedure InicializarCDSDetalhes;
@@ -43,6 +53,7 @@ type
     procedure CarregarItensLista(const AItens: TObjectList<TFinanceiroVendaItemDTO>);
   public
     constructor Create(AOwner: TComponent); override;
+    property OnVendaSelecionada: TOnVendaSelecionada read FOnVendaSelecionada write FOnVendaSelecionada;
   end;
 
 var
@@ -56,10 +67,14 @@ constructor TfrmListagemVenda.Create(AOwner: TComponent);
 begin
   inherited;
   FController := TVendaController.Create;
+  FClienteController := TClienteController.Create;
+  FProdutoController := TProdutoController.Create;
 end;
 
 procedure TfrmListagemVenda.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
+  FProdutoController.Free;
+  FClienteController.Free;
   FController.Free;
   inherited;
 end;
@@ -78,10 +93,21 @@ procedure TfrmListagemVenda.cdsListaAfterScroll(DataSet: TDataSet);
 begin
   inherited;
   if not cdsLista.Active or cdsLista.IsEmpty then
+  begin
+    Tag := 0;
+    DoVendaSelecionada;
     Exit;
+  end;
 
   Tag := cdsLista.FieldByName('id').AsInteger;
+  DoVendaSelecionada;
   CarregarItensVenda(Tag);
+end;
+
+procedure TfrmListagemVenda.DoVendaSelecionada;
+begin
+  if Assigned(FOnVendaSelecionada) then
+    FOnVendaSelecionada(Self, cdsLista.FieldByName('statusId').AsInteger, Tag);
 end;
 
 function TfrmListagemVenda.StatusVendaToText(const AStatus: Integer): string;
@@ -116,6 +142,42 @@ begin
   Result := FormatFloat('R$ #,##0.00', AValor);
 end;
 
+function TfrmListagemVenda.NomeClientePorId(const AClienteId: Integer): string;
+var
+  LCliente: TFinanceiroClienteDTO;
+begin
+  Result := 'Cliente ' + IntToStr(AClienteId);
+  if AClienteId <= 0 then
+    Exit;
+
+  LCliente := FClienteController.ObterPorId(AClienteId);
+  try
+    if Assigned(LCliente) then
+      Result := LCliente.Nome;
+  finally
+    if Assigned(LCliente) then
+      LCliente.Free;
+  end;
+end;
+
+function TfrmListagemVenda.NomeProdutoPorId(const AProdutoId: Integer): string;
+var
+  LProduto: TFinanceiroProdutoDTO;
+begin
+  Result := 'Produto ' + IntToStr(AProdutoId);
+  if AProdutoId <= 0 then
+    Exit;
+
+  LProduto := FProdutoController.ObterPorId(AProdutoId);
+  try
+    if Assigned(LProduto) then
+      Result := LProduto.Nome;
+  finally
+    if Assigned(LProduto) then
+      LProduto.Free;
+  end;
+end;
+
 procedure TfrmListagemVenda.CarregarItensLista(const AItens: TObjectList<TFinanceiroVendaItemDTO>);
 var
   LItem: TFinanceiroVendaItemDTO;
@@ -130,9 +192,10 @@ begin
       Continue;
 
     cdsDetalhes.Append;
-    cdsDetalhes.FieldByName('id').AsInteger := LItem.Id;
+    cdsDetalhes.FieldByName('id').AsInteger := Succ(cdsDetalhes.RecordCount);
     cdsDetalhes.FieldByName('vendaId').AsInteger := LItem.VendaId;
     cdsDetalhes.FieldByName('produtoId').AsInteger := LItem.ProdutoId;
+    cdsDetalhes.FieldByName('produtoNome').AsString := NomeProdutoPorId(LItem.ProdutoId);
     cdsDetalhes.FieldByName('quantidade').AsInteger := LItem.Quantidade;
     cdsDetalhes.FieldByName('valorUnitario').AsString := ValorItemToCurrencyText(LItem.ValorUnitario);
     cdsDetalhes.Post;
@@ -175,6 +238,8 @@ begin
         cdsLista.Append;
         cdsLista.FieldByName('id').AsInteger := LVenda.Id;
         cdsLista.FieldByName('clienteId').AsInteger := LVenda.ClienteId;
+        cdsLista.FieldByName('clienteNome').AsString := NomeClientePorId(LVenda.ClienteId);
+        cdsLista.FieldByName('statusId').AsInteger := LVenda.Status;
         cdsLista.FieldByName('status').AsString := StatusVendaToText(LVenda.Status);
         cdsLista.FieldByName('pagoEm').AsString := PagoEmToText(LVenda.PagoEm);
         cdsLista.FieldByName('total').AsString := TotalToCurrencyText(LVenda.Total);
@@ -201,6 +266,8 @@ begin
 
   cdsLista.FieldDefs.Add('id', ftInteger);
   cdsLista.FieldDefs.Add('clienteId', ftInteger);
+  cdsLista.FieldDefs.Add('clienteNome', ftString, 200);
+  cdsLista.FieldDefs.Add('statusId', ftInteger);
   cdsLista.FieldDefs.Add('status', ftString, 40);
   cdsLista.FieldDefs.Add('pagoEm', ftString, 20);
   cdsLista.FieldDefs.Add('total', ftString, 30);
@@ -217,6 +284,7 @@ begin
   cdsDetalhes.FieldDefs.Add('id', ftInteger);
   cdsDetalhes.FieldDefs.Add('vendaId', ftInteger);
   cdsDetalhes.FieldDefs.Add('produtoId', ftInteger);
+  cdsDetalhes.FieldDefs.Add('produtoNome', ftString, 200);
   cdsDetalhes.FieldDefs.Add('quantidade', ftInteger);
   cdsDetalhes.FieldDefs.Add('valorUnitario', ftString, 30);
 
@@ -236,12 +304,27 @@ begin
   col.Width := 60;
   col.Alignment := taRightJustify;
   col.ReadOnly := True;
+  col.Visible := False;
 
   col := grdListagem.Columns.Add;
   col.FieldName := 'clienteId';
-  col.Title.Caption := 'Cliente';
+  col.Title.Caption := 'Cliente ID';
   col.Width := 80;
   col.ReadOnly := True;
+  col.Visible := False;
+
+  col := grdListagem.Columns.Add;
+  col.FieldName := 'clienteNome';
+  col.Title.Caption := 'Cliente';
+  col.Width := 220;
+  col.ReadOnly := True;
+
+  col := grdListagem.Columns.Add;
+  col.FieldName := 'statusId';
+  col.Title.Caption := 'Status ID';
+  col.Width := 80;
+  col.ReadOnly := True;
+  col.Visible := False;
 
   col := grdListagem.Columns.Add;
   col.FieldName := 'status';
@@ -276,8 +359,15 @@ begin
 
   col := grdDetalhes.Columns.Add;
   col.FieldName := 'produtoId';
-  col.Title.Caption := 'Produto';
+  col.Title.Caption := 'Produto ID';
   col.Width := 100;
+  col.ReadOnly := True;
+  col.Visible := False;
+
+  col := grdDetalhes.Columns.Add;
+  col.FieldName := 'produtoNome';
+  col.Title.Caption := 'Produto';
+  col.Width := 220;
   col.ReadOnly := True;
 
   col := grdDetalhes.Columns.Add;

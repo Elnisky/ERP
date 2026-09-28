@@ -34,25 +34,16 @@ object frmCadVenda: TfrmCadVenda
       Height = 15
       Caption = 'Status'
     end
-    object edtClienteId: TEdit
-      Left = 80
-      Top = 16
-      Width = 121
-      Height = 23
-      TabOrder = 0
-    end
     object cmbStatus: TComboBox
       Left = 80
       Top = 65
       Width = 185
       Height = 23
       Style = csDropDownList
-      TabOrder = 1
+      TabOrder = 0
       Items.Strings = (
         'Orcamento'
-        'PagamentoPendente'
-        'Pago'
-        'Cancelado')
+        'PagamentoPendente')
     end
     object btnAdicionarItem: TButton
       Left = 16
@@ -60,7 +51,7 @@ object frmCadVenda: TfrmCadVenda
       Width = 121
       Height = 30
       Caption = 'Adicionar item'
-      TabOrder = 2
+      TabOrder = 1
       OnClick = btnAdicionarItemClick
     end
     object btnRemoverItem: TButton
@@ -69,7 +60,7 @@ object frmCadVenda: TfrmCadVenda
       Width = 121
       Height = 30
       Caption = 'Remover item'
-      TabOrder = 3
+      TabOrder = 2
       OnClick = btnRemoverItemClick
     end
     object grdItens: TDBGrid
@@ -78,7 +69,7 @@ object frmCadVenda: TfrmCadVenda
       Width = 720
       Height = 240
       DataSource = dsItens
-      TabOrder = 4
+      TabOrder = 3
       TitleFont.Charset = DEFAULT_CHARSET
       TitleFont.Color = clWindowText
       TitleFont.Height = -12
@@ -89,7 +80,13 @@ object frmCadVenda: TfrmCadVenda
           Expanded = False
           FieldName = 'produtoId'
           Title.Caption = 'Produto ID'
-          Width = 120
+          Visible = False
+        end
+        item
+          Expanded = False
+          FieldName = 'produtoNome'
+          Title.Caption = 'Produto'
+          Width = 240
           Visible = True
         end
         item
@@ -106,6 +103,14 @@ object frmCadVenda: TfrmCadVenda
           Width = 160
           Visible = True
         end>
+    end
+    object cmbCliente: TComboBox
+      Left = 80
+      Top = 17
+      Width = 185
+      Height = 23
+      Style = csDropDownList
+      TabOrder = 4
     end
   end
   object pnlRodape: TPanel

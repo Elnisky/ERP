@@ -24,7 +24,7 @@ namespace Financeiro.Domain.Entities
         public int Id { get; set; }
         public int VendaId { get; set; }
         public Venda Venda { get; set; }
-        public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
+        public DateTime CriadoEm { get; set; } = DateTime.Now;
         public DateTime? CompletedAt { get; set; }
         public decimal Valor { get; set; }
         public TipoPagamento Type { get; set; }

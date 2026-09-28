@@ -24,7 +24,7 @@ namespace Financeiro.Application.Services
             var pagamento = new Pagamento
             {
                 VendaId = pagamentoPostDTO.VendaId,
-                CriadoEm = DateTime.UtcNow,
+                CriadoEm = DateTime.Now,
                 Valor = pagamentoPostDTO.Valor,
                 Type = pagamentoPostDTO.Type,
                 Status = PagamentoStatus.Pendente
@@ -104,7 +104,7 @@ namespace Financeiro.Application.Services
             pagamento.Status = pagamentoPutDTO.Status;
             if ((pagamentoPutDTO.Status == PagamentoStatus.Pago || pagamentoPutDTO.Status == PagamentoStatus.Cancelado))
             {
-                pagamento.CompletedAt = pagamentoPutDTO.CompletedAt ?? DateTime.UtcNow;
+                pagamento.CompletedAt = pagamentoPutDTO.CompletedAt ?? DateTime.Now;
             }
             else
             {

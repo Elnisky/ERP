@@ -29,7 +29,7 @@ namespace Financeiro.Application.Services
             var venda = new Venda
             {
                 ClienteId = vendaPostDTO.ClienteId,
-                CriadoEm = DateTime.UtcNow,
+                CriadoEm = DateTime.Now,
                 Status = vendaPostDTO.Status,
                 VendaItens = vendaPostDTO.Itens?.Select(i => new VendaItem
                 {
@@ -148,9 +148,15 @@ namespace Financeiro.Application.Services
             if (pagamentosVenda.Any(p => p.Status != PagamentoStatus.Pendente))
                 throw new BadRequestException("Não é permitido alterar a venda pois existem pagamentos já processados.");
 
-            venda.Status = vendaPutDTO.Status;
-            venda.PagoEm = vendaPutDTO.PagoEm;
+            if (vendaPutDTO.Status < venda.Status)
+                throw new BadRequestException("Não é possível retroceder o status da venda.");
 
+            venda.Status = vendaPutDTO.Status;
+            if (venda.Status == StatusVenda.Pago)
+            {
+                venda.PagoEm = DateTime.Now;
+            }
+            
             var updated = await _vendaRepository.UpdateAsync(venda);
             return new VendaGetDTO
             {

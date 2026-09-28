@@ -9,6 +9,7 @@ namespace Financeiro.Application.Interfaces
         Task<List<VendaItemGetDTO>> GetAllAsync();
         Task<VendaItemGetDTO> AddAsync(VendaItemPostDTO vendaItemPostDTO);
         Task<VendaItemGetDTO> UpdateAsync(VendaItemPutDTO vendaItemPutDTO);
+        Task<List<VendaItemGetDTO>> UpdateManyAsync(List<VendaItemPostDTO> vendaItemPostDTOs);
         Task<VendaItemGetDTO> DeleteAsync(int id);
     }
 }

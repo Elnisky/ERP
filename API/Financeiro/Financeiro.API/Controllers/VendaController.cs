@@ -95,12 +95,12 @@ namespace Financeiro.API.Controllers
         }
 
         [HttpPut("itens")]
-        public async Task<IActionResult> UpdateItem(VendaItemPutDTO vendaItemPutDTO)
+        public async Task<IActionResult> UpdateItems([FromBody] List<VendaItemPostDTO> vendaItemPostDTOs)
         {
             try
             {
-                var updated = await _vendaItemService.UpdateAsync(vendaItemPutDTO);
-                return Ok(new { message = "Item atualizado com sucesso.", item = updated });
+                var updated = await _vendaItemService.UpdateManyAsync(vendaItemPostDTOs);
+                return Ok(new { message = "Itens atualizados com sucesso.", items = updated });
             }
             catch (ArgumentException ex)
             {

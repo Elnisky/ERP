@@ -6,6 +6,7 @@ uses
   System.Classes,
   System.SysUtils,
   System.JSON,
+  System.Generics.Collections,
   System.StrUtils,
   System.UITypes,
   Data.DB,
@@ -17,17 +18,28 @@ uses
   Vcl.Grids,
   Vcl.DBGrids,
   Vcl.StdCtrls,
+  ClienteController,
+  ProdutoController,
   VendaController,
   Financeiro.DTOs;
 
 type
+  TComboItem = class
+  private
+    FId: Integer;
+    FNome: string;
+  public
+    constructor Create(const AId: Integer; const ANome: string);
+    property Id: Integer read FId;
+    property Nome: string read FNome;
+  end;
+
   TfrmCadVenda = class(TForm)
     pnlRodape: TPanel;
     btnCancelar: TButton;
     btnConfirmar: TButton;
     pnlDados: TPanel;
     lblClienteId: TLabel;
-    edtClienteId: TEdit;
     lblStatus: TLabel;
     cmbStatus: TComboBox;
     btnAdicionarItem: TButton;
@@ -35,6 +47,7 @@ type
     grdItens: TDBGrid;
     dsItens: TDataSource;
     cdsItens: TClientDataSet;
+    cmbCliente: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure btnCancelarClick(Sender: TObject);
     procedure btnConfirmarClick(Sender: TObject);
@@ -42,14 +55,24 @@ type
     procedure btnRemoverItemClick(Sender: TObject);
   private
     FController: TVendaController;
+    FClienteController: TClienteController;
+    FProdutoController: TProdutoController;
     FVendaId: Integer;
+    FClienteId: Integer;
     procedure InicializarCDSItens;
-    function BuildJson: string;
+    procedure CarregarClientesAsync;
+    procedure PreencherComboClientes(const AClientes: TObjectList<TFinanceiroClienteDTO>);
+    function ClienteSelecionadoId: Integer;
+    function BuildJsonVenda(const Status: ShortInt): string;
+    function BuildItensJson: string;
     function ValidarFormulario: Boolean;
     procedure CarregarVenda(const AId: Integer);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+
+    procedure CancelarVenda;
+    procedure PagarVenda;
   end;
 
 var
@@ -63,17 +86,20 @@ constructor TfrmCadVenda.Create(AOwner: TComponent);
 begin
   inherited;
   FController := TVendaController.Create;
+  FClienteController := TClienteController.Create;
+  FProdutoController := TProdutoController.Create;
+  FClienteId := 0;
   InicializarCDSItens;
   cmbStatus.Items.Clear;
   cmbStatus.Items.Add('Orcamento');
-  cmbStatus.Items.Add('PagamentoPendente');
-  cmbStatus.Items.Add('Pago');
-  cmbStatus.Items.Add('Cancelado');
+  cmbStatus.Items.Add('Pagamento Pendente');
   cmbStatus.ItemIndex := 0;
 end;
 
 destructor TfrmCadVenda.Destroy;
 begin
+  FProdutoController.Free;
+  FClienteController.Free;
   FController.Free;
   inherited;
 end;
@@ -81,8 +107,7 @@ end;
 procedure TfrmCadVenda.FormCreate(Sender: TObject);
 begin
   inherited;
-  if Tag > 0 then
-    CarregarVenda(Tag);
+  CarregarClientesAsync;
 end;
 
 procedure TfrmCadVenda.btnCancelarClick(Sender: TObject);
@@ -94,44 +119,42 @@ procedure TfrmCadVenda.btnAdicionarItemClick(Sender: TObject);
 var
   LProdutoId: Integer;
   LQuantidade: Integer;
-  LValorUnitario: Double;
+  LProduto: TFinanceiroProdutoDTO;
   LProdutoIdText: string;
   LQuantidadeText: string;
-  LValorText: string;
 begin
-  LProdutoIdText := InputBox('Adicionar item', 'Produto ID:', '');
-  if Trim(LProdutoIdText).IsEmpty then
-    Exit;
+  LProduto := nil;
+  try
+    LProdutoIdText := InputBox('Adicionar item', 'Produto ID:', '');
+    if Trim(LProdutoIdText).IsEmpty then
+      Exit;
 
-  LProdutoId := StrToIntDef(LProdutoIdText, 0);
-  if LProdutoId <= 0 then
-  begin
-    ShowMessage('Informe um código de produto válido.');
-    Exit;
+    LProdutoId := StrToIntDef(LProdutoIdText, 0);
+    if LProdutoId <= 0 then
+      raise Exception.Create('Informe um código de produto válido.');
+
+    LProduto := FProdutoController.ObterPorId(LProdutoId);
+    if not Assigned(LProduto) then
+      raise Exception.CreateFmt('Produto %d não encontrado.', [LProdutoId]);
+
+    LQuantidadeText := InputBox('Adicionar item', 'Quantidade:', '1');
+    LQuantidade := StrToIntDef(LQuantidadeText, 0);
+    if LQuantidade <= 0 then
+      raise Exception.Create('Informe uma quantidade válida.');
+
+    cdsItens.Append;
+    cdsItens.FieldByName('produtoId').AsInteger := LProduto.Id;
+    cdsItens.FieldByName('produtoNome').AsString := LProduto.Nome;
+    cdsItens.FieldByName('quantidade').AsInteger := LQuantidade;
+    cdsItens.FieldByName('valorUnitario').AsFloat := LProduto.Preco;
+    cdsItens.Post;
+  except
+    on E: Exception do
+      ShowMessage('Falha ao adicionar item: ' + E.Message);
   end;
 
-  LQuantidadeText := InputBox('Adicionar item', 'Quantidade:', '1');
-  LQuantidade := StrToIntDef(LQuantidadeText, 0);
-  if LQuantidade <= 0 then
-  begin
-    ShowMessage('Informe uma quantidade válida.');
-    Exit;
-  end;
-
-  LValorText := InputBox('Adicionar item', 'Valor unitário:', '0,00');
-  LValorText := StringReplace(LValorText, '.', ',', [rfReplaceAll]);
-  LValorUnitario := StrToFloatDef(LValorText, 0);
-  if LValorUnitario <= 0 then
-  begin
-    ShowMessage('Informe um valor unitário válido.');
-    Exit;
-  end;
-
-  cdsItens.Append;
-  cdsItens.FieldByName('produtoId').AsInteger := LProdutoId;
-  cdsItens.FieldByName('quantidade').AsInteger := LQuantidade;
-  cdsItens.FieldByName('valorUnitario').AsFloat := LValorUnitario;
-  cdsItens.Post;
+  if Assigned(LProduto) then
+    LProduto.Free;
 end;
 
 procedure TfrmCadVenda.btnRemoverItemClick(Sender: TObject);
@@ -148,62 +171,62 @@ end;
 function TfrmCadVenda.ValidarFormulario: Boolean;
 begin
   Result := False;
+  try
+    FClienteId := ClienteSelecionadoId;
+    if FClienteId <= 0 then
+      raise Exception.Create('Informe um cliente válido para a venda.');
 
-  if Trim(edtClienteId.Text).IsEmpty then
-  begin
-    ShowMessage('Informe o cliente da venda.');
-    Exit;
+    if cdsItens.IsEmpty then
+      raise Exception.Create('Adicione pelo menos um item à venda.');
+
+    Result := True;
+  except
+    on E: Exception do
+      ShowMessage('Valores inválidos: ' + E.Message);
   end;
-
-  if StrToIntDef(edtClienteId.Text, 0) <= 0 then
-  begin
-    ShowMessage('Informe um cliente válido.');
-    Exit;
-  end;
-
-  if cdsItens.IsEmpty then
-  begin
-    ShowMessage('Adicione pelo menos um item à venda.');
-    Exit;
-  end;
-
-  Result := True;
 end;
 
-function TfrmCadVenda.BuildJson: string;
+function TfrmCadVenda.BuildJsonVenda(const Status: ShortInt): string;
 var
   LRoot: TJSONObject;
-  LItens: TJSONArray;
-  LItem: TJSONObject;
 begin
   LRoot := TJSONObject.Create;
-  LItens := TJSONArray.Create;
   try
     if FVendaId > 0 then
       LRoot.AddPair('id', TJSONNumber.Create(FVendaId));
 
-    LRoot.AddPair('clienteId', TJSONNumber.Create(StrToIntDef(edtClienteId.Text, 0)));
-    LRoot.AddPair('status', TJSONNumber.Create(cmbStatus.ItemIndex));
-
-    if FVendaId <= 0 then
-    begin
-      cdsItens.First;
-      while not cdsItens.Eof do
-      begin
-        LItem := TJSONObject.Create;
-        LItem.AddPair('produtoId', TJSONNumber.Create(cdsItens.FieldByName('produtoId').AsInteger));
-        LItem.AddPair('quantidade', TJSONNumber.Create(cdsItens.FieldByName('quantidade').AsInteger));
-        LItem.AddPair('valorUnitario', TJSONNumber.Create(cdsItens.FieldByName('valorUnitario').AsFloat));
-        LItens.AddElement(LItem);
-        cdsItens.Next;
-      end;
-
-      LRoot.AddPair('itens', LItens);
-    end;
-
+    LRoot.AddPair('clienteId', TJSONNumber.Create(FClienteId));
+    LRoot.AddPair('status', TJSONNumber.Create(Status));
+    if FVendaId = 0 then
+      LRoot.AddPair('itens', TJSONObject.ParseJSONValue(BuildItensJson));
     Result := LRoot.ToString;
   finally
     LRoot.Free;
+  end;
+end;
+
+function TfrmCadVenda.BuildItensJson: string;
+var
+  LArray: TJSONArray;
+  LItem: TJSONObject;
+begin
+  LArray := TJSONArray.Create;
+  try
+    cdsItens.First;
+    while not cdsItens.Eof do
+    begin
+      LItem := TJSONObject.Create;
+      LItem.AddPair('vendaId', TJSONNumber.Create(FVendaId));
+      LItem.AddPair('produtoId', TJSONNumber.Create(cdsItens.FieldByName('produtoId').AsInteger));
+      LItem.AddPair('quantidade', TJSONNumber.Create(cdsItens.FieldByName('quantidade').AsInteger));
+      LItem.AddPair('valorUnitario', TJSONNumber.Create(cdsItens.FieldByName('valorUnitario').AsFloat));
+      LArray.AddElement(LItem);
+      cdsItens.Next;
+    end;
+
+    Result := LArray.ToString;
+  finally
+    LArray.Free;
   end;
 end;
 
@@ -216,24 +239,29 @@ begin
     Exit;
 
   try
-    LJson := BuildJson;
+    LJson := BuildJsonVenda(cmbStatus.ItemIndex);
 
     if FVendaId > 0 then
-      LVenda := FController.Atualizar(LJson)
-    else
-      LVenda := FController.Criar(LJson);
-
-    try
-      if Assigned(LVenda) then
-      begin
-        ShowMessage('Venda salva com sucesso!');
-        ModalResult := mrOk;
-        Close;
+    begin
+      LVenda := FController.Atualizar(LJson);
+      try
+        if Assigned(LVenda) and not cdsItens.IsEmpty then
+          FController.ItemAtualizar(BuildItensJson);
+      finally
+        if Assigned(LVenda) then
+          LVenda.Free;
       end;
-    finally
+    end
+    else
+    begin
+      LVenda := FController.Criar(LJson);
       if Assigned(LVenda) then
         LVenda.Free;
     end;
+
+    ShowMessage('Venda salva com sucesso!');
+    ModalResult := mrOk;
+    Close;
   except
     on E: Exception do
       ShowMessage('Erro ao salvar venda: ' + E.Message);
@@ -244,43 +272,188 @@ procedure TfrmCadVenda.InicializarCDSItens;
 begin
   cdsItens.Close;
   cdsItens.FieldDefs.Clear;
+  cdsItens.FieldDefs.Add('id', ftInteger);
   cdsItens.FieldDefs.Add('produtoId', ftInteger);
+  cdsItens.FieldDefs.Add('produtoNome', ftString, 200);
   cdsItens.FieldDefs.Add('quantidade', ftInteger);
   cdsItens.FieldDefs.Add('valorUnitario', ftFloat);
   cdsItens.CreateDataSet;
   cdsItens.EmptyDataSet;
 end;
 
+procedure TfrmCadVenda.CancelarVenda;
+var
+  LVenda : TFinanceiroVendaDTO;
+begin
+  try
+    LVenda := FController.ObterPorId(Tag);
+    FVendaId := LVenda.Id;
+    FClienteId := LVenda.ClienteId;
+    if Assigned(LVenda) and (LVenda.Status > 1) then
+      raise Exception.Create('O status da venda não permite a sua alteração!');
+    FController.Atualizar(BuildJsonVenda(3));
+    ShowMessage('A venda foi cancelada!');
+  except
+    on E: Exception do
+      ShowMessage('Erro ao cancelar venda: ' + E.Message);
+  end;
+end;
+
+procedure TfrmCadVenda.CarregarClientesAsync;
+begin
+  TThread.CreateAnonymousThread(procedure
+                                var
+                                  LClientes: TObjectList<TFinanceiroClienteDTO>;
+                                begin
+                                  try
+                                    LClientes := FClienteController.Listar;
+                                    TThread.Queue(nil,
+                                                  procedure
+                                                  begin
+                                                    PreencherComboClientes(LClientes);
+                                                    if Tag > 0 then
+                                                      CarregarVenda(Tag);
+                                                  end);
+                                  except
+                                    on E: Exception do
+                                      TThread.Queue(nil,
+                                                    procedure
+                                                    begin
+                                                      ShowMessage('Erro ao carregar clientes: ' + E.Message);
+                                                    end);
+                                  end;
+                                end).Start;
+end;
+
+procedure TfrmCadVenda.PagarVenda;
+var
+  LVenda : TFinanceiroVendaDTO;
+begin
+  try
+    LVenda := FController.ObterPorId(Tag);
+    FVendaId := LVenda.Id;
+    FClienteId := LVenda.ClienteId;
+    if Assigned(LVenda) and (LVenda.Status > 1) then
+      raise Exception.Create('O status da venda não permite a sua alteração!');
+    FController.Atualizar(BuildJsonVenda(2));
+    ShowMessage('Pagamento efetuado com sucesso!');
+  except
+    on E: Exception do
+      ShowMessage('Erro ao pagar a venda: ' + E.Message);
+  end;
+end;
+
+procedure TfrmCadVenda.PreencherComboClientes(const AClientes: TObjectList<TFinanceiroClienteDTO>);
+var
+  LCliente: TFinanceiroClienteDTO;
+  LItem: TComboItem;
+begin
+  cmbCliente.Items.BeginUpdate;
+  try
+    cmbCliente.Clear;
+    if not Assigned(AClientes) then
+      Exit;
+
+    for LCliente in AClientes do
+    begin
+      if not Assigned(LCliente) then
+        Continue;
+
+      LItem := TComboItem.Create(LCliente.Id, LCliente.Nome);
+      cmbCliente.Items.AddObject(LCliente.Nome, LItem);
+    end;
+
+    if cmbCliente.Items.Count > 0 then
+      cmbCliente.ItemIndex := 0;
+  finally
+    cmbCliente.Items.EndUpdate;
+  end;
+end;
+
+function TfrmCadVenda.ClienteSelecionadoId: Integer;
+var
+  LItem: TComboItem;
+begin
+  Result := 0;
+  if (cmbCliente.ItemIndex < 0) or (cmbCliente.ItemIndex >= cmbCliente.Items.Count) then
+    Exit;
+
+  if Assigned(cmbCliente.Items.Objects[cmbCliente.ItemIndex]) and (cmbCliente.Items.Objects[cmbCliente.ItemIndex] is TComboItem) then
+  begin
+    LItem := TComboItem(cmbCliente.Items.Objects[cmbCliente.ItemIndex]);
+    Result := LItem.Id;
+  end;
+end;
+
 procedure TfrmCadVenda.CarregarVenda(const AId: Integer);
 var
   LVenda: TFinanceiroVendaDTO;
   LItem: TFinanceiroVendaItemDTO;
+  LProduto: TFinanceiroProdutoDTO;
+  I: Integer;
+  LClienteItem: TComboItem;
 begin
   FVendaId := AId;
   LVenda := FController.ObterPorId(AId);
   try
-    if not Assigned(LVenda) then
-      Exit;
+    try
+      if not Assigned(LVenda) then
+        Exit;
 
-    edtClienteId.Text := LVenda.ClienteId.ToString;
-    cmbStatus.ItemIndex := LVenda.Status;
+      FClienteId := LVenda.ClienteId;
+      for I := 0 to Pred(cmbCliente.Items.Count) do
+      begin
+        if Assigned(cmbCliente.Items.Objects[I]) and
+           (cmbCliente.Items.Objects[I] is TComboItem) then
+        begin
+          LClienteItem := TComboItem(cmbCliente.Items.Objects[I]);
+          if LClienteItem.Id = LVenda.ClienteId then
+          begin
+            cmbCliente.ItemIndex := I;
+            Break;
+          end;
+        end;
+      end;
 
-    cdsItens.EmptyDataSet;
-    for LItem in LVenda.Itens do
-    begin
-      if not Assigned(LItem) then
-        Continue;
+      cmbStatus.ItemIndex := LVenda.Status;
+      cdsItens.EmptyDataSet;
+      for LItem in LVenda.Itens do
+      begin
+        if not Assigned(LItem) then
+          Continue;
 
-      cdsItens.Append;
-      cdsItens.FieldByName('produtoId').AsInteger := LItem.ProdutoId;
-      cdsItens.FieldByName('quantidade').AsInteger := LItem.Quantidade;
-      cdsItens.FieldByName('valorUnitario').AsFloat := LItem.ValorUnitario;
-      cdsItens.Post;
+        LProduto := FProdutoController.ObterPorId(LItem.ProdutoId);
+        try
+          cdsItens.Append;
+          cdsItens.FieldByName('id').AsInteger := LItem.Id;
+          cdsItens.FieldByName('produtoId').AsInteger := LItem.ProdutoId;
+          cdsItens.FieldByName('produtoNome').AsString := LProduto.Nome;
+          cdsItens.FieldByName('quantidade').AsInteger := LItem.Quantidade;
+          cdsItens.FieldByName('valorUnitario').AsFloat := LItem.ValorUnitario;
+          cdsItens.Post;
+        finally
+          if Assigned(LProduto) then
+            LProduto.Free;
+        end;
+      end;
+    except
+      on E: Exception do
+      begin
+        Close;
+        ShowMessage('Erro ao carregar dados da venda: ' + E.Message);
+      end;
     end;
   finally
     if Assigned(LVenda) then
       LVenda.Free;
   end;
+end;
+
+constructor TComboItem.Create(const AId: Integer; const ANome: string);
+begin
+  inherited Create;
+  FId := AId;
+  FNome := ANome;
 end;
 
 end.

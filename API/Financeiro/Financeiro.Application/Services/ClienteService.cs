@@ -27,7 +27,7 @@ namespace Financeiro.Application.Services
                 Cpf = clientePostDTO.Cpf,
                 Email = clientePostDTO.Email,
                 Telefone = clientePostDTO.Telefone,
-                DataCadastro = DateTime.UtcNow
+                DataCadastro = DateTime.Now
             };
 
             var createdCliente = await _clienteRepository.AddAsync(cliente);

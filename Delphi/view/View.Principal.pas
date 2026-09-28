@@ -48,10 +48,12 @@ type
     procedure btnEditarClienteClick(Sender: TObject);
     procedure btnExcluirClienteClick(Sender: TObject);
     procedure btnIncluirVendaClick(Sender: TObject);
+    procedure btnEditarVendaClick(Sender: TObject);
+    procedure btnExcluirVendaClick(Sender: TObject);
   private
     FForm: TForm;
   public
-    { Public declarations }
+    procedure AtualizarBotoesVenda(Sender: TObject; const AStatusId: Integer; const AVendaId: Integer);
   end;
 
 var
@@ -92,6 +94,25 @@ begin
   end;
 end;
 
+procedure TfrmPrincipal.btnEditarVendaClick(Sender: TObject);
+begin
+  if Assigned(FForm) and (FForm is TfrmListagemVenda) then
+  begin
+    Tag := FForm.Tag;
+    FreeAndNil(FForm);
+  end
+  else
+    raise Exception.Create('Realize uma consulta primeiro!');
+
+  FForm := TfrmCadVenda.Create(nil);
+  try
+    FForm.Tag := Tag;
+    FForm.ShowModal;
+  finally
+    btnMenu.Click;
+  end;
+end;
+
 procedure TfrmPrincipal.btnExcluirClienteClick(Sender: TObject);
 begin
   if Assigned(FForm) then
@@ -109,6 +130,28 @@ begin
 
   try
     TfrmCadCliente(FForm).Excluir(Tag);
+  finally
+    btnMenu.Click;
+  end;
+end;
+
+procedure TfrmPrincipal.btnExcluirVendaClick(Sender: TObject);
+begin
+  if Assigned(FForm) and (FForm is TfrmListagemVenda) then
+  begin
+    Tag := FForm.Tag;
+    FreeAndNil(FForm);
+  end
+  else
+    raise Exception.Create('Realize uma consulta primeiro!');
+
+  FForm := TfrmCadVenda.Create(nil);
+  try
+    FForm.Tag := Tag;
+    if (Sender = btnExcluirVenda) then
+      TfrmCadVenda(FForm).CancelarVenda
+    else
+      TfrmCadVenda(FForm).PagarVenda;
   finally
     btnMenu.Click;
   end;
@@ -153,15 +196,26 @@ begin
   else if Trim(TButton(Sender).Name).EndsWith('Produto') then
     FForm := TfrmProdutoListagem.Create(nil)
   else
+  begin
     FForm := TfrmListagemVenda.Create(nil);
+    TfrmListagemVenda(FForm).OnVendaSelecionada := AtualizarBotoesVenda;
+  end;
 
   try
     FForm.Parent := Self;
     FForm.Align := alClient;
     FForm.Show;
+    if FForm is TfrmListagemVenda then
+      TfrmListagemVenda(FForm).OnVendaSelecionada := AtualizarBotoesVenda;
   finally
     btnMenu.Click;
   end;
+end;
+
+procedure TfrmPrincipal.AtualizarBotoesVenda(Sender: TObject; const AStatusId: Integer; const AVendaId: Integer);
+begin
+  btnEditarVenda.Enabled := AStatusId <> 2;
+  btnPagarVenda.Enabled := AStatusId = 1
 end;
 
 procedure TfrmPrincipal.btnMenuClick(Sender: TObject);
