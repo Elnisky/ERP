@@ -4,13 +4,15 @@ interface
 
 uses
   HttpClient.Types,
-  System.JSON;
+  System.JSON,
+  System.SysUtils;
 
 type
   IHttpResponse = interface
     ['{8DB7A821-FC54-4A50-866F-33BA0471068C}']
     function StatusCode: Integer;
     function Content: string;
+    function ContentBytes: TBytes;
     function JsonValue: TJSONValue;
   end;
 

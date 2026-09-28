@@ -120,9 +120,7 @@ Os serviços são registrados em `Financeiro.Infra.Ioc/DependencyInjection.cs`. 
 
 Observações
 -----------
-- Em produção, considere usar MailKit/MimeKit em vez de System.Net.Mail para maior controle e compatibilidade.
 - Logging e tratamento de erros no envio de e‑mail podem ser melhorados (atualmente silenciado no fluxo da venda).
-- Testes automatizados não foram fornecidos neste README; recomenda‑se adicionar testes para os serviços críticos.
 
 Contato / manutenção
 --------------------

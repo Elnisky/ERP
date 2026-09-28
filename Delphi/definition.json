@@ -347,6 +347,29 @@
         }
       }
     },
+    "/api/vendas/{id}/confirmacao-pdf": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Venda": {
       "post": {
         "tags": [
@@ -533,17 +556,26 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VendaItemPutDTO"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/VendaItemPostDTO"
+                }
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/VendaItemPutDTO"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/VendaItemPostDTO"
+                }
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/VendaItemPutDTO"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/VendaItemPostDTO"
+                }
               }
             }
           }
@@ -807,29 +839,6 @@
         },
         "additionalProperties": false
       },
-      "VendaItemPutDTO": {
-        "required": [
-          "id",
-          "quantidade",
-          "valorUnitario"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "quantidade": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "valorUnitario": {
-            "type": "number",
-            "format": "double"
-          }
-        },
-        "additionalProperties": false
-      },
       "VendaPostDTO": {
         "required": [
           "clienteId"
@@ -865,11 +874,6 @@
           },
           "status": {
             "$ref": "#/components/schemas/StatusVenda"
-          },
-          "pagoEm": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -898,6 +902,9 @@
     },
     {
       "name": "Produto"
+    },
+    {
+      "name": "Reports"
     },
     {
       "name": "Venda"

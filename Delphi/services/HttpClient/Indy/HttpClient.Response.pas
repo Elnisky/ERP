@@ -12,16 +12,19 @@ type
   private
     FStatusCode: Integer;
     FContent: string;
+    FContentBytes: TBytes;
     FJsonValue: TJSONValue;
 
     procedure ParseJson;
   public
     constructor Create(const AStatusCode: Integer;
-                       const AContent: string);
+                       const AContent: string;
+                       const AContentBytes: TBytes = nil);
     destructor Destroy; override;
 
     function StatusCode: Integer;
     function Content: string;
+    function ContentBytes: TBytes;
     function JsonValue: TJSONValue;
   end;
 
@@ -30,12 +33,18 @@ implementation
 { THttpResponse }
 
 constructor THttpResponse.Create(const AStatusCode: Integer;
-                                 const AContent: string);
+                                 const AContent: string;
+                                 const AContentBytes: TBytes = nil);
 begin
   inherited Create;
 
   FStatusCode := AStatusCode;
   FContent := AContent;
+  FContentBytes := AContentBytes;
+
+  if Length(FContentBytes) = 0 then
+    FContentBytes := TEncoding.UTF8.GetBytes(FContent);
+
   FJsonValue := nil;
 
   ParseJson;
@@ -67,6 +76,11 @@ end;
 function THttpResponse.Content: string;
 begin
   Result := FContent;
+end;
+
+function THttpResponse.ContentBytes: TBytes;
+begin
+  Result := FContentBytes;
 end;
 
 function THttpResponse.JsonValue: TJSONValue;

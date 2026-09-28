@@ -11,6 +11,7 @@ object frmPrincipal: TfrmPrincipal
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poOwnerFormCenter
+  OnClose = FormClose
   OnCreate = FormCreate
   TextHeight = 15
   object svMenu: TSplitView
@@ -51,16 +52,16 @@ object frmPrincipal: TfrmPrincipal
           TabOrder = 0
           OnClick = btnListarClienteClick
         end
-        object btnExcluirVenda: TButton
+        object btnCancelarVenda: TButton
           AlignWithMargins = True
           Left = 3
           Top = 96
           Width = 138
           Height = 25
           Align = alTop
-          Caption = 'Excluir Venda'
+          Caption = 'Cancelar Venda'
           TabOrder = 1
-          OnClick = btnExcluirVendaClick
+          OnClick = btnCancelarVendaClick
         end
         object btnEditarVenda: TButton
           AlignWithMargins = True
@@ -93,7 +94,7 @@ object frmPrincipal: TfrmPrincipal
           Align = alTop
           Caption = 'Pagar Venda'
           TabOrder = 4
-          OnClick = btnExcluirVendaClick
+          OnClick = btnCancelarVendaClick
         end
       end
       object pnlCadastroProduto: TCategoryPanel

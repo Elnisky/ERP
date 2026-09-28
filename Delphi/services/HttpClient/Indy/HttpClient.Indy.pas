@@ -67,6 +67,20 @@ implementation
 uses
   HttpClient.Response;
 
+function DecodeHttpContent(const ABytes: TBytes): string;
+begin
+  Result := '';
+  if Length(ABytes) = 0 then
+    Exit;
+
+  try
+    Result := TEncoding.UTF8.GetString(ABytes);
+  except
+    on E: EEncodingError do
+      Result := TEncoding.ANSI.GetString(ABytes);
+  end;
+end;
+
 { TIndyHttpClient }
 
 constructor TIndyHttpClient.Create;
@@ -230,13 +244,14 @@ function TIndyHttpClient.ExecuteRequest(const AMethod: THttpMethod;
                                         const AUrl: string;
                                         const ABody: string): IHttpResponse;
 var
-  LRequestStream,
-  LResponseStream: TStringStream;
+  LRequestStream: TStringStream;
+  LResponseStream: TMemoryStream;
   LContent: string;
+  LContentBytes: TBytes;
   LStatusCode: Integer;
 begin
   LRequestStream := nil;
-  LResponseStream := TStringStream.Create('', TEncoding.UTF8);
+  LResponseStream := TMemoryStream.Create;
 
   try
     ConfigureRequest;
@@ -254,15 +269,25 @@ begin
       end;
 
       LStatusCode := FIdHTTP.ResponseCode;
-      LContent := LResponseStream.DataString;
+      SetLength(LContentBytes, LResponseStream.Size);
+      if LResponseStream.Size > 0 then
+        Move(LResponseStream.Memory^, LContentBytes[0], LResponseStream.Size);
+
+      LContent := DecodeHttpContent(LContentBytes);
     except
       on E: EIdHTTPProtocolException do
       begin
         LStatusCode := E.ErrorCode;
         LContent := E.ErrorMessage;
+        LContentBytes := TEncoding.UTF8.GetBytes(LContent);
 
         if LContent.IsEmpty then
-          LContent := LResponseStream.DataString;
+        begin
+          SetLength(LContentBytes, LResponseStream.Size);
+          if LResponseStream.Size > 0 then
+            Move(LResponseStream.Memory^, LContentBytes[0], LResponseStream.Size);
+          LContent := DecodeHttpContent(LContentBytes);
+        end;
       end;
 
       on E: EIdException do
@@ -272,7 +297,7 @@ begin
         raise Exception.CreateFmt('Erro ao executar requisição HTTP para "%s": %s', [AUrl, E.Message]);
     end;
 
-    Result := THttpResponse.Create(LStatusCode, LContent);
+    Result := THttpResponse.Create(LStatusCode, LContent, LContentBytes);
   finally
     LRequestStream.Free;
     LResponseStream.Free;

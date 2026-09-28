@@ -5,6 +5,7 @@ interface
 uses
   System.Generics.Collections,
   System.JSON,
+  System.SysUtils,
   Financeiro.DTOs;
 
 type
@@ -33,6 +34,7 @@ type
     function VendaCriar(const AJson: string): TFinanceiroVendaDTO;
     function VendaAtualizar(const AJson: string): TFinanceiroVendaDTO;
     function VendaExcluir(const AId: Integer): Boolean;
+    function VendaConfirmacaoPdf(const AId: Integer): TBytes;
     function VendaItensListar(const AVendaId: Integer): TObjectList<TFinanceiroVendaItemDTO>;
     function VendaItemAdicionar(const AVendaId: Integer; const AJson: string): TFinanceiroVendaItemDTO;
     function VendaItemAtualizar(const AJson: string): TFinanceiroVendaItemDTO;

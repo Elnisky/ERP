@@ -53,6 +53,7 @@ type
     function VendaCriar(const AJson: string): TFinanceiroVendaDTO;
     function VendaAtualizar(const AJson: string): TFinanceiroVendaDTO;
     function VendaExcluir(const AId: Integer): Boolean;
+    function VendaConfirmacaoPdf(const AId: Integer): TBytes;
     function VendaItensListar(const AVendaId: Integer): TObjectList<TFinanceiroVendaItemDTO>;
     function VendaItemAdicionar(const AVendaId: Integer; const AJson: string): TFinanceiroVendaItemDTO;
     function VendaItemAtualizar(const AJson: string): TFinanceiroVendaItemDTO;
@@ -456,7 +457,12 @@ begin
 
     LObject := AsObject(LJson, 'VendaCriar');
     if Assigned(LObject) then
+    begin
+      if Assigned(LObject.GetValue('venda')) and (LObject.GetValue('venda') is TJSONObject) then
+        LObject := TJSONObject(LObject.GetValue('venda'));
+
       Result := TFinanceiroVendaDTO.FromJson(LObject.ToString);
+    end;
   finally
     LJson.Free;
   end;
@@ -475,7 +481,12 @@ begin
 
     LObject := AsObject(LJson, 'VendaAtualizar');
     if Assigned(LObject) then
+    begin
+      if Assigned(LObject.GetValue('venda')) and (LObject.GetValue('venda') is TJSONObject) then
+        LObject := TJSONObject(LObject.GetValue('venda'));
+
       Result := TFinanceiroVendaDTO.FromJson(LObject.ToString);
+    end;
   finally
     LJson.Free;
   end;
@@ -485,6 +496,20 @@ function TFinanceiroApiClient.VendaExcluir(const AId: Integer): Boolean;
 begin
   ExecuteJsonRequest(hmDelete, '/api/Venda/' + AId.ToString);
   Result := True;
+end;
+
+function TFinanceiroApiClient.VendaConfirmacaoPdf(const AId: Integer): TBytes;
+var
+  LResponse: IHttpResponse;
+begin
+  LResponse := FHttpClient.BaseUrl(FBaseUrl).Get('/api/vendas/' + AId.ToString + '/confirmacao-pdf');
+  ValidarResponse(LResponse);
+
+  Result := LResponse.ContentBytes;
+  if Length(Result) = 0 then
+    raise EFinanceiroApiException.Create('A API Financeiro retornou um PDF vazio para a confirmação da venda.',
+                                         LResponse.StatusCode,
+                                         LResponse.Content);
 end;
 
 function TFinanceiroApiClient.VendaItensListar(const AVendaId: Integer): TObjectList<TFinanceiroVendaItemDTO>;

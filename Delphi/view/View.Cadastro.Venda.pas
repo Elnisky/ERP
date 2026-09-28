@@ -7,6 +7,7 @@ uses
   System.SysUtils,
   System.JSON,
   System.Generics.Collections,
+  System.IOUtils,
   System.StrUtils,
   System.UITypes,
   Data.DB,
@@ -18,6 +19,8 @@ uses
   Vcl.Grids,
   Vcl.DBGrids,
   Vcl.StdCtrls,
+  Winapi.ShellAPI,
+  Winapi.Windows,
   ClienteController,
   ProdutoController,
   VendaController,
@@ -66,6 +69,7 @@ type
     function BuildJsonVenda(const Status: ShortInt): string;
     function BuildItensJson: string;
     function ValidarFormulario: Boolean;
+    procedure SalvarPdfConfirmacao(const AVendaId: Integer);
     procedure CarregarVenda(const AId: Integer);
   public
     constructor Create(AOwner: TComponent); override;
@@ -256,7 +260,16 @@ begin
     begin
       LVenda := FController.Criar(LJson);
       if Assigned(LVenda) then
+      begin
+        try
+          SalvarPdfConfirmacao(LVenda.Id);
+        except
+          on E: Exception do
+            ShowMessage('Venda salva, mas não foi possível abrir o PDF: ' + E.Message);
+        end;
+
         LVenda.Free;
+      end;
     end;
 
     ShowMessage('Venda salva com sucesso!');
@@ -266,6 +279,19 @@ begin
     on E: Exception do
       ShowMessage('Erro ao salvar venda: ' + E.Message);
   end;
+end;
+
+procedure TfrmCadVenda.SalvarPdfConfirmacao(const AVendaId: Integer);
+var
+  LBytes: TBytes;
+  LArquivo: string;
+begin
+  LBytes := FController.ConfirmacaoPdf(AVendaId);
+  LArquivo := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName)) +
+    Format('confirmacao-venda-%d.pdf', [AVendaId]);
+
+  TFile.WriteAllBytes(LArquivo, LBytes);
+  ShellExecute(0, 'open', PChar(LArquivo), nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure TfrmCadVenda.InicializarCDSItens;

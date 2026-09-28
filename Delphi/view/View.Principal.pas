@@ -5,6 +5,7 @@ interface
 uses
   System.Classes,
   System.ImageList,
+  System.IOUtils,
   System.SysUtils,
   System.Variants,
   Vcl.Controls,
@@ -37,19 +38,20 @@ type
     btnIncluirProduto: TButton;
     pnlCadastroVenda: TCategoryPanel;
     btnListarVenda: TButton;
-    btnExcluirVenda: TButton;
+    btnCancelarVenda: TButton;
     btnEditarVenda: TButton;
     btnIncluirVenda: TButton;
     btnPagarVenda: TButton;
     procedure btnMenuClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnListarClienteClick(Sender: TObject);
     procedure btnIncluirClienteClick(Sender: TObject);
     procedure btnEditarClienteClick(Sender: TObject);
     procedure btnExcluirClienteClick(Sender: TObject);
     procedure btnIncluirVendaClick(Sender: TObject);
     procedure btnEditarVendaClick(Sender: TObject);
-    procedure btnExcluirVendaClick(Sender: TObject);
+    procedure btnCancelarVendaClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     FForm: TForm;
   public
@@ -70,6 +72,24 @@ uses
   View.Listagem.Venda;
 
 {$R *.dfm}
+
+procedure TfrmPrincipal.FormClose(Sender: TObject; var Action: TCloseAction);
+var
+  LArquivos: TArray<string>;
+  LArquivo: string;
+begin
+  LArquivos := TDirectory.GetFiles(ExtractFilePath(Application.ExeName), '*.pdf');
+  for LArquivo in LArquivos do
+  begin
+    try
+      if TFile.Exists(LArquivo) then
+        TFile.Delete(LArquivo);
+    except
+      on E: Exception do
+        ;// só pra não apresentar erro se o arquivo estiver em uso
+    end;
+  end;
+end;
 
 procedure TfrmPrincipal.btnEditarClienteClick(Sender: TObject);
 begin
@@ -135,7 +155,7 @@ begin
   end;
 end;
 
-procedure TfrmPrincipal.btnExcluirVendaClick(Sender: TObject);
+procedure TfrmPrincipal.btnCancelarVendaClick(Sender: TObject);
 begin
   if Assigned(FForm) and (FForm is TfrmListagemVenda) then
   begin
@@ -148,7 +168,7 @@ begin
   FForm := TfrmCadVenda.Create(nil);
   try
     FForm.Tag := Tag;
-    if (Sender = btnExcluirVenda) then
+    if (Sender = btnCancelarVenda) then
       TfrmCadVenda(FForm).CancelarVenda
     else
       TfrmCadVenda(FForm).PagarVenda;

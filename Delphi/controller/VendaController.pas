@@ -25,6 +25,7 @@ type
     function Criar(const AJson: string): TFinanceiroVendaDTO;
     function Atualizar(const AJson: string): TFinanceiroVendaDTO;
     function Excluir(const AId: Integer): Boolean;
+    function ConfirmacaoPdf(const AId: Integer): TBytes;
     function ItemAdicionar(const AVendaId: Integer; const AJson: string): TFinanceiroVendaItemDTO;
     function ItemAtualizar(const AJson: string): TFinanceiroVendaItemDTO;
     function ItemExcluir(const AId: Integer): Boolean;
@@ -73,6 +74,11 @@ end;
 function TVendaController.Excluir(const AId: Integer): Boolean;
 begin
   Result := FApiClient.VendaExcluir(AId);
+end;
+
+function TVendaController.ConfirmacaoPdf(const AId: Integer): TBytes;
+begin
+  Result := FApiClient.VendaConfirmacaoPdf(AId);
 end;
 
 function TVendaController.ItemAdicionar(const AVendaId: Integer; const AJson: string): TFinanceiroVendaItemDTO;
